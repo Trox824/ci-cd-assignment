@@ -66,17 +66,6 @@ pipeline {
             }
         }
 
-        stage('Build Frontend') {
-            steps {
-                dir('Application/Frontend') {
-                    sh '''
-                        npm install -g serve
-                        npm run build
-                    '''
-                }
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 script {
@@ -84,7 +73,17 @@ pipeline {
                 }
             }
         }
-                            
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
+                        docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}").push()
+                        docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}").push('latest')
+                    }
+                }
+            }
+        }
 
         stage('Deploy to Production') {
             steps {
