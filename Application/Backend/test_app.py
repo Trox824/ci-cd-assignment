@@ -3,7 +3,7 @@ import os
 from fastapi.testclient import TestClient
 from unittest.mock import patch
 import requests  # Import requests to access RequestException
-from Application.Backend.app import app
+from app import app
 
 client = TestClient(app)
 

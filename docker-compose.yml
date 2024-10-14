@@ -7,7 +7,9 @@ services:
       target: backend
     ports:
       - "8000:8000"
-    command: uvicorn app:app --host 0.0.0.0 --port 8000
+    command: uvicorn Application.Backend.app:app --host 0.0.0.0 --port 8000
+    volumes:
+      - ./Application/Backend:/app/Application/Backend    
 
   frontend:
     build:
