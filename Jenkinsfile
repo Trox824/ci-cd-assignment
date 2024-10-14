@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        VENV_PATH = 'Application/Backend/venv'
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -9,13 +13,26 @@ pipeline {
             }
         }
 
+        stage('Setup Python Environment') {
+            steps {
+                sh """
+                    python3 -m venv ${VENV_PATH}
+                    . ${VENV_PATH}/bin/activate
+                    pip install --upgrade pip
+                    pip install -r Application/Backend/requirements.txt
+                """
+            }
+        }
+
+
         stage('Install Dependencies') {
             steps {
-                // Install backend dependencies for FastAPI
-                sh 'pip install -r backend/requirements.txt'
+                sh """
+                    . ${VENV_PATH}/bin/activate
+                    pip install -r Application/Backend/requirements.txt
+                """
                 
-                // Install frontend dependencies for React
-                dir('frontend') {
+                dir('Application/Frontend') {
                     sh 'npm install'
                 }
             }
@@ -23,15 +40,17 @@ pipeline {
 
         stage('Run Backend Tests') {
             steps {
-                // Run any backend tests you have (e.g., using pytest)
-                sh 'pytest'
+                sh """
+                    . ${VENV_PATH}/bin/activate
+                    pytest Application/Backend
+                """
             }
         }
 
         stage('Build Frontend') {
             steps {
                 // Build the React frontend
-                dir('frontend') {
+                dir('Application/Frontend') {
                     sh 'npm run build'
                 }
             }
