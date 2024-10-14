@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'NodeJS 16' // Replace with the name you provided in Global Tool Configuration
+        nodejs 'NodeJS 16' // Ensure this matches the name in Jenkins Global Tool Configuration
     }
 
     environment {
@@ -43,11 +43,32 @@ pipeline {
             }
         }
 
+        stage('Verify Workspace') {
+            steps {
+                sh 'echo "Listing all files in workspace:"'
+                sh 'ls -R'
+            }
+        }
+
         stage('Run Backend Tests') {
             steps {
+                // Verify pytest installation and version
                 sh """
                     . ${VENV_PATH}/bin/activate
-                    pytest Application/Backend
+                    which pytest
+                    pytest --version
+                """
+
+                // List all test files to verify their presence
+                sh """
+                    echo "Listing test files in Application/Backend:"
+                    find Application/Backend -type f -name 'test_*.py' -or -name '*_test.py'
+                """
+
+                // Run pytest in verbose mode
+                sh """
+                    . ${VENV_PATH}/bin/activate
+                    pytest Application/Backend/tests -v
                 """
             }
         }
@@ -63,7 +84,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("your-docker-image-name:${env.BUILD_NUMBER}")
+                    docker.build("tuanhungnguyen189/myapp:${env.BUILD_NUMBER}")
                 }
             }
         }
