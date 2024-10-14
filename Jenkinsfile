@@ -43,13 +43,6 @@ pipeline {
             }
         }
 
-        stage('Verify Workspace') {
-            steps {
-                sh 'echo "Listing all files in workspace:"'
-                sh 'ls -R'
-            }
-        }
-
         stage('Run Backend Tests') {
             steps {
                 // Verify pytest installation and version
@@ -58,13 +51,11 @@ pipeline {
                     which pytest
                     pytest --version
                 """
-
-                // List all test files to verify their presence
+                // Install httpx for testing
                 sh """
-                    echo "Listing test files in Application/Backend:"
-                    find Application/Backend -type f -name 'test_*.py' -or -name '*_test.py'
+                    . ${VENV_PATH}/bin/activate
+                    pip install httpx
                 """
-
                 // Run pytest in verbose mode
                 sh """
                     . ${VENV_PATH}/bin/activate
