@@ -68,7 +68,8 @@ pipeline {
                 // Run pytest in verbose mode
                 sh """
                     . ${VENV_PATH}/bin/activate
-                    pytest Application/Backend/tests -v
+                    cd Application/Backend
+                    pytest test_app.py -v
                 """
             }
         }
