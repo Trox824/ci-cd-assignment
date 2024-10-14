@@ -24,21 +24,15 @@ pipeline {
             }
         }
 
-        stage('Install Backend Dependencies') {
+        stage('Install Dependencies') {
             steps {
                 sh """
                     . ${VENV_PATH}/bin/activate
                     pip install -r Application/Backend/requirements.txt
                 """
-            }
-        }
-
-        stage('Install Frontend Dependencies') {
-            steps {
+                
                 dir('Application/Frontend') {
-                    docker.image('node:16').inside {
-                        sh 'npm install'
-                    }
+                    sh 'npm install'
                 }
             }
         }
