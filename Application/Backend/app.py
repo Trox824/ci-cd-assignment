@@ -5,6 +5,10 @@ from fastapi.middleware.cors import CORSMiddleware  # Import CORSMiddleware
 
 app = FastAPI()
 
+@app.get("/")
+def read_root():
+    return {"message": "Hello from the DevOps Pipeline!"}
+
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -26,43 +30,25 @@ app.add_middleware(
 # Base URL for the Exchange rate API
 BASE_API_URL = "https://v6.exchangerate-api.com/v6/c794e36475a70d94f5e6bbf2/latest/"
 
+@app.get("/")
+def read_root():
+    return {"message": "Hello from the DevOps Pipeline!"}
+
 @app.get("/convert")
 def convert_currency(amount: float, from_currency: str, to_currency: str):
+    api_url = f"https://v6.exchangerate-api.com/v6/c794e36475a70d94f5e6bbf2/latest/{from_currency}"
     try:
-        # Fetch exchange rates using the 'from_currency' as the base
-        api_url = f"{BASE_API_URL}{from_currency.upper()}"
-        logger.info(f"Requesting exchange rates from: {api_url}")
-        
         response = requests.get(api_url)
-        response.raise_for_status()  # Raise HTTPError for bad responses
+        response.raise_for_status()
         data = response.json()
-        
-        logger.info(f"API Response: {data}")
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Error fetching exchange rates: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Error fetching exchange rates: {str(e)}")
-
-    # Check if "conversion_rates" is in the response
-    if "conversion_rates" not in data:
-        logger.error(f"Invalid response format: {data}")
-        raise HTTPException(status_code=500, detail="Invalid response format")
-
-    # Get exchange rate for the target currency
-    to_rate = data["conversion_rates"].get(to_currency.upper())
-
-    if to_rate is None:
-        logger.error(f"Invalid currency code: {to_currency}")
-        raise HTTPException(status_code=400, detail=f"Invalid currency code: {to_currency}")
-
-    # Perform conversion
-    try:
-        converted_amount = amount * to_rate
-        logger.info(f"Conversion successful: {amount} {from_currency} = {converted_amount} {to_currency}")
+        rates = data.get("conversion_rates", {})
+        if to_currency not in rates:
+            raise HTTPException(status_code=400, detail=f"Invalid currency code: {to_currency}")
+        converted_amount = amount * rates[to_currency]
         return {
             "converted_amount": converted_amount,
             "from_currency": from_currency,
             "to_currency": to_currency
         }
-    except Exception as e:
-        logger.error(f"Error during conversion: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Error during conversion: {str(e)}")
+    except requests.exceptions.RequestException:
+        raise HTTPException(status_code=500, detail="Error fetching exchange rates")
