@@ -68,18 +68,11 @@ pipeline {
         stage('Build Frontend') {
             steps {
                 dir('Application/Frontend') {
-                    sh 'npm run build'
+                    sh 'serve -s build'
                 }
             }
         }
 
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    docker.build("tuanhungnguyen189/myapp:${env.BUILD_NUMBER}")
-                }
-            }
-        }
 
         stage('Deploy to Production') {
             steps {
