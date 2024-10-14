@@ -1,8 +1,16 @@
+import sys
+import os
 from fastapi.testclient import TestClient
 from unittest.mock import patch
+import requests  # Import requests to access RequestException
 from Application.Backend.app import app
 
 client = TestClient(app)
+
+# Add the project root to sys.path
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
 def test_read_root():
     response = client.get("/")
@@ -51,7 +59,7 @@ def test_convert_currency_invalid_currency(mock_get):
 
 @patch("Application.Backend.app.requests.get")
 def test_convert_currency_api_failure(mock_get):
-    mock_get.side_effect = Exception("API Failure")
+    mock_get.side_effect = requests.exceptions.RequestException("API Failure")
 
     response = client.get("/convert", params={
         "amount": 100,
