@@ -36,7 +36,9 @@ pipeline {
         stage('Install Frontend Dependencies') {
             steps {
                 dir('Application/Frontend') {
-                    sh 'npm install'
+                    docker.image('node:16').inside {
+                        sh 'npm install'
+                    }
                 }
             }
         }
