@@ -9,13 +9,24 @@ pipeline {
             }
         }
 
+        stage('Setup Python Environment') {
+            steps {
+                sh '''
+                    python3 -m venv Application/Backend/venv
+                    . Application/Backend/venv/bin/activate
+                    pip install -r Application/Backend/requirements.txt
+                '''
+            }
+        }
+
+
         stage('Install Dependencies') {
             steps {
                 // Install backend dependencies for FastAPI
-                sh 'pip install -r backend/requirements.txt'
+                sh 'pip install -r Application/Backend/requirements.txt'
                 
                 // Install frontend dependencies for React
-                dir('frontend') {
+                dir('Application/Frontend') {
                     sh 'npm install'
                 }
             }
@@ -31,7 +42,7 @@ pipeline {
         stage('Build Frontend') {
             steps {
                 // Build the React frontend
-                dir('frontend') {
+                dir('Application/Frontend') {
                     sh 'npm run build'
                 }
             }
