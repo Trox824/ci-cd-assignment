@@ -1,2 +1,77 @@
+# Root level
+.DS_Store
+.env
+.vscode/
+*.log
+node_modules/
+
+# Backend
+Application/Backend/__pycache__/
+Application/Backend/*.pyc
+Application/Backend/*.pyo
+Application/Backend/*.pyd
+Application/Backend/.pytest_cache/
+Application/Backend/.coverage
+Application/Backend/htmlcov/
+Application/Backend/.venv/
+Application/Backend/venv/
+Application/Backend/env/
+
+# Frontend
+Application/Frontend/node_modules/
+Application/Frontend/.pnp
+Application/Frontend/.pnp.js
+Application/Frontend/coverage/
+Application/Frontend/build/
+Application/Frontend/.DS_Store
+Application/Frontend/.env.local
+Application/Frontend/.env.development.local
+Application/Frontend/.env.test.local
+Application/Frontend/.env.production.local
+Application/Frontend/npm-debug.log*
+Application/Frontend/yarn-debug.log*
+Application/Frontend/yarn-error.log*
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
 # Virtual environment
+.env
+.venv
+env/
 venv/
+ENV/
+
+# IDE specific files
+.idea/
+*.swp
+*.swo
+.vscode/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Docker
+*.dockerignore
+
+# Test coverage
+.coverage
+htmlcov/
+
+# Pytest cache
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Package files
+*.egg
+*.egg-info/
