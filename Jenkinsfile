@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    tools {
+        nodejs 'NodeJS 16' // Replace with the name you provided in Global Tool Configuration
+    }
+
     environment {
         VENV_PATH = 'Application/Backend/venv'
     }
@@ -26,11 +30,13 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
+                // Install Python dependencies
                 sh """
                     . ${VENV_PATH}/bin/activate
                     pip install -r Application/Backend/requirements.txt
                 """
-                
+
+                // Install Node.js dependencies
                 dir('Application/Frontend') {
                     sh 'npm install'
                 }
