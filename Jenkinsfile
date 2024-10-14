@@ -7,6 +7,7 @@ pipeline {
 
     environment {
         VENV_PATH = 'Application/Backend/venv'
+        DOCKER_IMAGE = 'tuanhungnguyen189/myapp'
     }
 
     stages {
@@ -79,7 +80,18 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("tuanhungnguyen189/myapp:${env.BUILD_NUMBER}")
+                    docker.build("${DOCKER_IMAGE}:${env.BUILD_NUMBER}", "-f Dockerfile .")
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
+                        docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}").push()
+                        docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}").push('latest')
+                    }
                 }
             }
         }
@@ -88,6 +100,8 @@ pipeline {
             steps {
                 // Add your deployment steps here
                 echo 'Deploying to production...'
+                // Example: Update your deployment with the new image
+                // sh "kubectl set image deployment/myapp myapp=${DOCKER_IMAGE}:${env.BUILD_NUMBER}"
             }
         }
     }
