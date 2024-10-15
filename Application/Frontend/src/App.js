@@ -12,7 +12,7 @@ function App() {
     setError("");
     setConvertedAmount(null);
     try {
-      const response = await axios.get("http://localhost:8000/convert", {
+      const response = await axios.get("http://44.211.160.71:8000/convert", {
         params: {
           amount: parseFloat(amount),
           from_currency: fromCurrency,
