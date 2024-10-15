@@ -11,7 +11,7 @@ RUN pip install --no-cache-dir -r Backend/requirements.txt
 COPY Application/Backend ./Backend
 
 # Frontend (React) - Stage 2
-FROM node:16-alpine as frontend
+FROM node:18-alpine as frontend
 
 WORKDIR /app/Frontend
 
