@@ -5,26 +5,23 @@ from fastapi.middleware.cors import CORSMiddleware  # Import CORSMiddleware
 
 app = FastAPI()
 
-@app.get("/")
-def read_root():
-    return {"message": "Hello from the DevOps Pipeline!"}
-
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Configure CORS
 origins = [
-    "http://localhost:3000",  # Frontend URL
+    "http://localhost:3000",             # Frontend URL for local development
+    "http://44.211.160.71:3000",         # Frontend URL via Public IPv4
     # Add other origins if needed
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,            # Allow specified origins
+    allow_origins=origins,                # Allow specified origins
     allow_credentials=True,
-    allow_methods=["*"],              # Allow all HTTP methods
-    allow_headers=["*"],              # Allow all headers
+    allow_methods=["*"],                  # Allow all HTTP methods
+    allow_headers=["*"],                  # Allow all headers
 )
 
 # Base URL for the Exchange rate API
@@ -36,7 +33,7 @@ def read_root():
 
 @app.get("/convert")
 def convert_currency(amount: float, from_currency: str, to_currency: str):
-    api_url = f"https://v6.exchangerate-api.com/v6/c794e36475a70d94f5e6bbf2/latest/{from_currency}"
+    api_url = f"{BASE_API_URL}{from_currency}"
     try:
         response = requests.get(api_url)
         response.raise_for_status()
