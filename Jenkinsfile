@@ -18,7 +18,7 @@ pipeline {
         stage('Build and Test') {
             steps {
                 script {
-                    // Start Docker if it's not running (assuming it's already configured to start without sudo)
+                    // Start Docker if it's not running
                     sh 'docker info || (systemctl start docker && systemctl enable docker)'
                     
                     // Stop any running containers and remove them
@@ -35,10 +35,8 @@ pipeline {
                     sh 'docker-compose down'
                 }
             }
-            //front end tests
+            // Front end tests (if any)
         }
-        
-
 
         stage('Deploy to Production') {
             when {
