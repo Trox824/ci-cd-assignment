@@ -102,9 +102,7 @@ pipeline {
                                             ssh -o StrictHostKeyChecking=no -v ec2-user@${instanceIp} << EOF
                                                 set -xe
                                                 echo "Connected to instance ${instanceId}"
-                                                cd /ci-cd-assignment || { echo "Failed to change directory"; exit 1; }
-                                                echo "Adding safe directory..."
-                                                git config --global --add safe.directory /ci-cd-assignment
+                                                cd /home/ec2-user/ci-cd-assignment || { echo "Failed to change directory"; exit 1; }
                                                 echo "Pulling latest changes..."
                                                 git pull origin main || { echo "Failed to pull latest changes"; exit 1; }
                                                 echo "Stopping existing containers..."
