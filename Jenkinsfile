@@ -20,7 +20,10 @@ pipeline {
                 script {
                     // Start Docker if it's not running (assuming it's already configured to start without sudo)
                     sh 'docker info || (systemctl start docker && systemctl enable docker)'
-
+                    
+                    // Stop any running containers and remove them
+                    sh 'docker-compose down --remove-orphans'
+                    
                     // Build and run containers
                     sh 'docker-compose up -d --build'
 
