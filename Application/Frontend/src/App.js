@@ -71,7 +71,7 @@ function App() {
 
         <button
           onClick={handleConvert}
-          className="w-full bg-red-500 text-white py-2 rounded-lg mt-4 hover:bg-red-600"
+          className="w-full bg-blue-500 text-white py-2 rounded-lg mt-4 hover:bg-blue-600"
         >
           Convert
         </button>

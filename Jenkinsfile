@@ -53,16 +53,16 @@ pipeline {
             steps {
                 echo "Attempting to deploy to production"
                 sshagent(credentials: ['ec2-ssh-key']) {
-                    sh """
+                    sh '''
                         set -xe
                         ssh -o StrictHostKeyChecking=no -v ${EC2_USER}@${EC2_INSTANCE_DNS} << EOF
-                            echo "Successfully connected to EC2 instance"
-                            cd ~/ci-cd-assignment || { echo "Failed to change directory"; exit 1; }
-                            git pull origin main || { echo "Failed to pull latest changes"; exit 1; }
-                            docker-compose down || { echo "Failed to stop existing containers"; exit 1; }
-                            docker-compose up -d --build || { echo "Failed to start new containers"; exit 1; }
-                        EOF
-                    """
+echo "Successfully connected to EC2 instance"
+cd ~/ci-cd-assignment || { echo "Failed to change directory"; exit 1; }
+git pull origin main || { echo "Failed to pull latest changes"; exit 1; }
+docker-compose down || { echo "Failed to stop existing containers"; exit 1; }
+docker-compose up -d --build || { echo "Failed to start new containers"; exit 1; }
+EOF
+                    '''
                 }
             }
         }
