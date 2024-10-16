@@ -1,6 +1,7 @@
 fastapi
 uvicorn
 pytest
+httpx
 jinja2 
 requests
 python-multipart

@@ -23,8 +23,11 @@ pipeline {
                     // Check if Docker is running
                     sh 'docker info || (echo "Docker is not running. Please start Docker." && exit 1)'
                     
-                    // Use docker-compose
+                    // Build images
                     sh 'docker-compose build'
+
+                    // Run backend tests
+                    sh 'docker-compose run --rm backend pip install -r requirements.txt'
                     sh 'docker-compose run --rm backend python -m pytest Application/Backend/test_app.py'
                 }
             }
@@ -44,9 +47,7 @@ pipeline {
 
                     // Run integration tests or smoke tests
                     sh '''
-                        # Add your integration test commands here
-                        # For example:
-                        # docker-compose exec -T app pytest integration_tests/
+                        docker-compose exec -T backend pytest Application/Backend/test_app.py
                     '''
                 }
             }
