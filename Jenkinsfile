@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        nodejs 'NodeJS 16' // Ensure this matches the name in Jenkins Global Tool Configuration
-    }
-
     environment {
         VENV_PATH = 'Application/Backend/venv'
         PATH = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${env.PATH}"
