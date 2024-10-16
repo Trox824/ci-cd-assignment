@@ -109,6 +109,8 @@ pipeline {
                                                 sudo chmod -R 775 /home/ec2-user/ci-cd-assignment/.git
                                                 echo "Adding safe directory..."
                                                 git config --global --add safe.directory /home/ec2-user/ci-cd-assignment
+                                                echo "Handling local changes..."
+                                                git reset --hard HEAD
                                                 echo "Pulling latest changes..."
                                                 git pull origin main || { echo "Failed to pull latest changes"; exit 1; }
                                                 echo "Stopping existing containers..."
