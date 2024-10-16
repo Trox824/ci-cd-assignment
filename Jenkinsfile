@@ -120,7 +120,8 @@ pipeline {
                                                 echo "Cleaning up Docker system..."
                                                 docker system prune -af || { echo "Failed to clean up Docker system"; exit 1; }
                                                 echo "Deployment to instance ${instanceId} completed successfully"
-                                            ENDSSH
+                                            ENDSSH 
+                                            
                                         """,
                                         returnStatus: true
                                     )
