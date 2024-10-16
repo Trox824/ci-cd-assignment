@@ -7,17 +7,13 @@ pipeline {
 
     environment {
         VENV_PATH = 'Application/Backend/venv'
-        EC2_INSTANCE_IP = '44.211.160.71' // Replace with your EC2 instance IP
-        EC2_USER = 'ec2-user' // Replace with your EC2 instance user
-        SSH_KEY = credentials('ec2-ssh-key') // Add this credential in Jenkins
-        TEST_ENV_IP = '12.34.56.78' // Replace with your test environment IP
-        TEST_ENV_USER = 'ec2-user' // Replace with your test environment user
+        // Remove EC2 related variables as they're not needed for local deployment
+        // TEST_ENV_IP and TEST_ENV_USER are also not needed
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // Checkout the source code from your repository
                 checkout scm
             }
         }
@@ -25,8 +21,8 @@ pipeline {
         stage('Build and Test') {
             steps {
                 // Enable Docker
-                sh 'systemctl start docker'
-                sh 'systemctl enable docker'
+                sh 'systemctl start docker || true'  // Use '|| true' to prevent failure if Docker is already running
+                sh 'systemctl enable docker || true'
                 sh 'docker-compose build'
                 sh 'docker-compose run --rm backend python -m pytest Application/Backend/test_app.py'
             }
