@@ -14,32 +14,28 @@ pipeline {
                 checkout scm
             }
         }
+    // stage('Build and Test') {
+            //     steps {
+            //         script {
+            //             // Start Docker if it's not running (assuming it's already configured to start without sudo)
+            //             sh 'docker info || (systemctl start docker && systemctl enable docker)'
+                        
+            //             // Stop any running containers and remove them
+            //             sh 'docker-compose down --remove-orphans'
+                        
+            //             // Build and run containers
+            //             sh 'docker-compose up -d --build'
 
-        // stage('Build and Test') {
-        //     steps {
-        //         script {
-        //             // Start Docker if it's not running (assuming it's already configured to start without sudo)
-        //             sh 'docker info || (systemctl start docker && systemctl enable docker)'
-                    
-        //             // Stop any running containers and remove them
-        //             sh 'docker-compose down --remove-orphans'
-                    
-        //             // Build and run containers
-        //             sh 'docker-compose up -d --build'
+            //             // Run backend tests
+            //             sh 'docker-compose run --rm backend pip install -r Backend/requirements.txt'
+            //             sh 'docker-compose run --rm backend python -m pytest Application/Backend/test_app.py'
 
-        //             // Run backend tests
-        //             sh 'docker-compose run --rm backend pip install -r Backend/requirements.txt'
-        //             sh 'docker-compose run --rm backend python -m pytest Application/Backend/test_app.py'
-
-        //             // Ensure all containers are stopped after tests
-        //             sh 'docker-compose down'
-        //         }
-        //     }
-        //     //front end tests
-        // }
-        
-
-
+            //             // Ensure all containers are stopped after tests
+            //             sh 'docker-compose down'
+            //         }
+            //     }
+            //     //front end tests
+            // }
         stage('Debug Info') {
             steps {
                 script {
@@ -49,7 +45,7 @@ pipeline {
                 }
             }
         }
-
+        
         stage('Deploy to Production') {
             when {
                 expression { 
@@ -58,14 +54,15 @@ pipeline {
             }
             steps {
                 script {
+                    echo "Attempting to deploy to production"
                     sshagent(credentials: ['ec2-ssh-key']) {
-                        // SSH into production, pull latest changes, and run docker-compose
                         sh """
-                            ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_INSTANCE_DNS} '
-                                cd ~/ci-cd-assignment
-                                git pull origin main
-                                docker-compose down
-                                docker-compose up -d --build
+                            ssh -o StrictHostKeyChecking=no -v ${EC2_USER}@${EC2_INSTANCE_DNS} '
+                                echo "Successfully connected to EC2 instance"
+                                cd ~/ci-cd-assignment || echo "Failed to change directory"
+                                git pull origin main || echo "Failed to pull latest changes"
+                                docker-compose down || echo "Failed to stop existing containers"
+                                docker-compose up -d --build || echo "Failed to start new containers"
                             '
                         """
                     }
