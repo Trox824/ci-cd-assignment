@@ -7,7 +7,11 @@ pipeline {
 
     environment {
         VENV_PATH = 'Application/Backend/venv'
-        DOCKER_IMAGE = 'tuanhungnguyen189/myapp'
+        EC2_INSTANCE_IP = '44.211.160.71' // Replace with your EC2 instance IP
+        EC2_USER = 'ec2-user' // Replace with your EC2 instance user
+        SSH_KEY = credentials('ec2-ssh-key') // Add this credential in Jenkins
+        TEST_ENV_IP = '12.34.56.78' // Replace with your test environment IP
+        TEST_ENV_USER = 'ec2-user' // Replace with your test environment user
     }
 
     stages {
@@ -18,62 +22,62 @@ pipeline {
             }
         }
 
-        stage('Setup Python Environment') {
+        stage('Build and Test') {
             steps {
-                sh """
-                    python3 -m venv ${VENV_PATH}
-                    . ${VENV_PATH}/bin/activate
-                    pip install --upgrade pip
-                    pip install -r Application/Backend/requirements.txt
-                """
+                // Enable Docker
+                sh 'systemctl start docker'
+                sh 'systemctl enable docker'
+                sh 'docker-compose build'
+                sh 'docker-compose run --rm backend python -m pytest Application/Backend/test_app.py'
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Deploy to Test Environment') {
             steps {
-                // Install Python dependencies
-                sh """
-                    . ${VENV_PATH}/bin/activate
-                    pip install -r Application/Backend/requirements.txt
-                """
+                script {
+                    // Stop any existing containers
+                    sh 'docker-compose down'
 
-                // Install Node.js dependencies
-                dir('Application/Frontend') {
-                    sh 'npm install'
+                    // Build and start the containers
+                    sh 'docker-compose up -d --build'
+
+                    // Wait for services to start (adjust time as needed)
+                    sh 'sleep 30'
+
+                    // Run integration tests or smoke tests
+                    sh '''
+                        # Add your integration test commands here
+                        # For example:
+                        # docker-compose exec app pytest integration_tests/
+                    '''
                 }
             }
         }
 
-        stage('Run Backend Tests') {
-            steps {
-                // Verify pytest installation and version
-                sh """
-                    . ${VENV_PATH}/bin/activate
-                    which pytest
-                    pytest --version
-                """
-                // Install httpx for testing
-                sh """
-                    . ${VENV_PATH}/bin/activate
-                    pip install httpx
-                """
-                // Run pytest in verbose mode
-                sh """
-                    . ${VENV_PATH}/bin/activate
-                    cd Application/Backend
-                    pytest test_app.py -v
-                """
-            }
-        }
+        // stage('Deploy to Production') {
+        //     when {
+        //         expression { 
+        //             return env.GIT_BRANCH == 'main' || env.GIT_BRANCH == 'master'
+        //         }
+        //     }
+        //     steps {
+        //         script {
+        //             sshagent(credentials: ['ec2-ssh-key']) {
+        //                 // Copy the project to production
+        //                 sh "scp -r -o StrictHostKeyChecking=no ./* ${EC2_USER}@${EC2_INSTANCE_IP}:~/app"
 
-        stage('Deploy to Production') {
-            steps {
-                // Add your deployment steps here
-                echo 'Deploying to production...'
-                // Example: Update your deployment with the new image
-                // sh "kubectl set image deployment/myapp myapp=${DOCKER_IMAGE}:${env.BUILD_NUMBER}"
-            }
-        }
+        //                 // SSH into production and run docker-compose
+        //                 sh """
+        //                     ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_INSTANCE_IP} '
+        //                         cd ~/app
+        //                         docker-compose down
+        //                         docker-compose up -d --build
+        //                     '
+        //                 """
+        //             }
+        //         }
+        //     }
+        // }
     }
 
     post {
