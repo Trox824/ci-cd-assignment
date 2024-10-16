@@ -49,7 +49,6 @@ pipeline {
                             ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_INSTANCE_IP} '
                                 cd ~/ci-cd-assignment
                                 git pull origin main
-                                docker-compose down
                                 docker-compose up -d --build
                             '
                         """
