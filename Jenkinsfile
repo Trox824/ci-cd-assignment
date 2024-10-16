@@ -18,27 +18,10 @@ pipeline {
                 script {
                     // Check if Docker is running
                     // Check if Docker is running
-                    sh 'sudo systemctl is-active docker || (echo "Docker is not running. Starting Docker..." && sudo systemctl start docker)'
-
+                    
                     // Wait for Docker to start if it wasn't running
-                    sh '''
-                        if [ $? -ne 0 ]; then
-                            echo "Waiting for Docker to start..."
-                            timeout=60
-                            while ! sudo systemctl is-active docker > /dev/null 2>&1 && [ $timeout -gt 0 ]; do
-                                sleep 1
-                                ((timeout--))
-                            done
-                            if [ $timeout -eq 0 ]; then
-                                echo "Failed to start Docker. Please check the Docker service."
-                                exit 1
-                            else
-                                echo "Docker started successfully."
-                            fi
-                        else
-                            echo "Docker is already running."
-                        fi
-                    '''
+                    sh 'sudo systemctl start docker'
+                    sh 'sudo systemctl enable docker'
 
                     // Build and run containers
                     sh 'sudo docker-compose up -d --build'
@@ -84,7 +67,9 @@ pipeline {
 
     post {
         always {
-            cleanWs()
+            node {
+                cleanWs()
+            }
         }
         success {
             echo "Build succeeded!"
