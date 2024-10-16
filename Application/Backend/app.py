@@ -46,7 +46,7 @@ def convert_currency(amount: float, from_currency: str, to_currency: str):
         return {
             "converted_amount": converted_amount,
             "from_currency": from_currency,
-            "to_currency": to_currency * 100
+            "to_currency": to_currency
         }
     except requests.exceptions.RequestException:
         raise HTTPException(status_code=500, detail="Error fetching exchange rates")
