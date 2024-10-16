@@ -14,28 +14,28 @@ pipeline {
                 checkout scm
             }
         }
-    // stage('Build and Test') {
-            //     steps {
-            //         script {
-            //             // Start Docker if it's not running (assuming it's already configured to start without sudo)
-            //             sh 'docker info || (systemctl start docker && systemctl enable docker)'
-                        
-            //             // Stop any running containers and remove them
-            //             sh 'docker-compose down --remove-orphans'
-                        
-            //             // Build and run containers
-            //             sh 'docker-compose up -d --build'
+        stage('Build and Test') {
+                    steps {
+                        script {
+                            // Start Docker if it's not running (assuming it's already configured to start without sudo)
+                            sh 'docker info || (systemctl start docker && systemctl enable docker)'
+                            
+                            // Stop any running containers and remove them
+                            sh 'docker-compose down --remove-orphans'
+                            
+                            // Build and run containers
+                            sh 'docker-compose up -d --build'
 
-            //             // Run backend tests
-            //             sh 'docker-compose run --rm backend pip install -r Backend/requirements.txt'
-            //             sh 'docker-compose run --rm backend python -m pytest Application/Backend/test_app.py'
+                            // Run backend tests
+                            sh 'docker-compose run --rm backend pip install -r Backend/requirements.txt'
+                            sh 'docker-compose run --rm backend python -m pytest Application/Backend/test_app.py'
 
-            //             // Ensure all containers are stopped after tests
-            //             sh 'docker-compose down'
-            //         }
-            //     }
-            //front end tests
-            // }
+                            // Ensure all containers are stopped after tests
+                            sh 'docker-compose down'
+                        }
+                    }
+                front end tests
+                }
         stage('Debug Info') {
             steps {
                 echo "Current branch: ${env.GIT_BRANCH}"
