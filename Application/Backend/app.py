@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 # Configure CORS
 origins = [
     "http://localhost:3000",             # Frontend URL for local development
-    "http://44.211.160.71:3000",         # Frontend URL via Public IPv4
+    "http://52.200.216.255:3000/",         # Frontend URL via Public IPv4
     "http://money-converter-load-balancer-1403607865.us-east-1.elb.amazonaws.com"
     # Add other origins if needed
 ]
