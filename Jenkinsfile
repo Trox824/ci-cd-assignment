@@ -103,6 +103,10 @@ pipeline {
                                                 set -xe
                                                 echo "Connected to instance ${instanceId}"
                                                 cd ~/ci-cd-assignment || { echo "Failed to change directory"; exit 1; }
+                                                echo "Setting correct permissions..."
+                                                sudo chown -R ec2-user:ec2-user /home/ec2-user/ci-cd-assignment
+                                                sudo chmod -R 755 /home/ec2-user/ci-cd-assignment
+                                                sudo chmod -R 775 /home/ec2-user/ci-cd-assignment/.git
                                                 echo "Adding safe directory..."
                                                 git config --global --add safe.directory /home/ec2-user/ci-cd-assignment
                                                 echo "Pulling latest changes..."
@@ -114,7 +118,7 @@ pipeline {
                                                 echo "Cleaning up Docker system..."
                                                 docker system prune -af || { echo "Failed to clean up Docker system"; exit 1; }
                                                 echo "Deployment to instance ${instanceId} completed successfully"
-            EOF
+                                            EOF
                                         """,
                                         returnStatus: true
                                     )
