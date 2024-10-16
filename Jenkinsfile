@@ -44,13 +44,11 @@ pipeline {
             steps {
                 script {
                     sshagent(credentials: ['ec2-ssh-key']) {
-                        // Copy the project to production
-                        sh "scp -r -o StrictHostKeyChecking=no ./* ${EC2_USER}@${EC2_INSTANCE_IP}:~/app"
-
-                        // SSH into production and run docker-compose
+                        // SSH into production, pull latest changes, and run docker-compose
                         sh """
                             ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_INSTANCE_IP} '
                                 cd ~/ci-cd-assignment
+                                git pull origin main
                                 docker-compose down
                                 docker-compose up -d --build
                             '
