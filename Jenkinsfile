@@ -16,22 +16,18 @@ pipeline {
         stage('Build and Test') {
             steps {
                 script {
-                    // Check if Docker is running
-                    // Check if Docker is running
-                    
-                    // Wait for Docker to start if it wasn't running
-                    sh 'sudo systemctl start docker'
-                    sh 'sudo systemctl enable docker'
+                    // Start Docker if it's not running (assuming it's already configured to start without sudo)
+                    sh 'docker info || (systemctl start docker && systemctl enable docker)'
 
                     // Build and run containers
-                    sh 'sudo docker-compose up -d --build'
+                    sh 'docker-compose up -d --build'
 
                     // Run backend tests
-                    sh 'sudo docker-compose run --rm backend pip install -r Backend/requirements.txt'
-                    sh 'sudo docker-compose run --rm backend python -m pytest Application/Backend/test_app.py'
+                    sh 'docker-compose run --rm backend pip install -r Backend/requirements.txt'
+                    sh 'docker-compose run --rm backend python -m pytest Application/Backend/test_app.py'
 
                     // Ensure all containers are stopped after tests
-                    sh 'sudo docker-compose down'
+                    sh 'docker-compose down'
                 }
             }
             //front end tests
