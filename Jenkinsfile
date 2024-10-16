@@ -5,7 +5,7 @@ pipeline {
         VENV_PATH = 'Application/Backend/venv'
         PATH = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${env.PATH}"
         EC2_USER = 'ec2-user'
-        EC2_INSTANCE_DNS = 'ec2-44-211-160-71.compute-1.amazonaws.com'
+        EC2_INSTANCE_DNS = 'ec2-3-89-75-30.compute-1.amazonaws.com'
     }
 
     stages {
@@ -38,35 +38,31 @@ pipeline {
             // }
         stage('Debug Info') {
             steps {
-                script {
-                    echo "Current branch: ${env.GIT_BRANCH}"
-                    echo "All environment variables:"
-                    sh 'env | sort'
-                }
+                echo "Current branch: ${env.GIT_BRANCH}"
+                echo "All environment variables:"
+                sh 'env | sort'
             }
         }
 
         stage('Deploy to Production') {
             when {
                 expression { 
-                    return env.GIT_BRANCH == 'origin/main' || env.GIT_BRANCH == 'origin/master'
+                    env.GIT_BRANCH == 'origin/main' || env.GIT_BRANCH == 'origin/master'
                 }
             }
             steps {
-                script {
-                    echo "Attempting to deploy to production"
-                    sshagent(credentials: ['ec2-ssh-key']) {
-                        sh """
-                            set -xe
-                            ssh -o StrictHostKeyChecking=no -v ${EC2_USER}@${EC2_INSTANCE_DNS} << EOF
-                                echo "Successfully connected to EC2 instance"
-                                cd ~/ci-cd-assignment || { echo "Failed to change directory"; exit 1; }
-                                git pull origin main || { echo "Failed to pull latest changes"; exit 1; }
-                                docker-compose down || { echo "Failed to stop existing containers"; exit 1; }
-                                docker-compose up -d --build || { echo "Failed to start new containers"; exit 1; }
-                            EOF
-                        """
-                    }
+                echo "Attempting to deploy to production"
+                sshagent(credentials: ['ec2-ssh-key']) {
+                    sh """
+                        set -xe
+                        ssh -o StrictHostKeyChecking=no -v ${EC2_USER}@${EC2_INSTANCE_DNS} << EOF
+                            echo "Successfully connected to EC2 instance"
+                            cd ~/ci-cd-assignment || { echo "Failed to change directory"; exit 1; }
+                            git pull origin main || { echo "Failed to pull latest changes"; exit 1; }
+                            docker-compose down || { echo "Failed to stop existing containers"; exit 1; }
+                            docker-compose up -d --build || { echo "Failed to start new containers"; exit 1; }
+                        EOF
+                    """
                 }
             }
         }
