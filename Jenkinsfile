@@ -17,29 +17,12 @@ pipeline {
             }
         }
 
-        stage('Build and Test') {
+        stage('Build, Test, and Deploy to Test Environment') {
             steps {
                 script {
                     // Check if Docker is running
                     sh 'docker info || (echo "Docker is not running. Please start Docker." && exit 1)'
                     
-                    // Build images
-                    sh 'docker-compose build'
-
-                    // Run backend tests
-                    sh 'docker-compose run --rm backend pip install -r Backend/requirements.txt'
-                    sh 'docker-compose run --rm backend python -m pytest Application/Backend/test_app.py'
-
-                    // Ensure all containers are stopped after tests
-                    sh 'docker-compose down'
-                }
-            }
-            //front end tests
-        }
-        
-        stage('Deploy to Test Environment') {
-            steps {
-                script {
                     // Stop any existing containers and remove them
                     sh 'docker-compose down --remove-orphans'
                     
@@ -49,11 +32,15 @@ pipeline {
                     // Wait a moment for the port to be released
                     sh 'sleep 5'
 
-                    // Build and start the containers
+                    // Build images and start containers
                     sh 'docker-compose up -d --build'
 
                     // Wait for services to start (adjust time as needed)
                     sh 'sleep 30'
+
+                    // Run backend tests
+                    sh 'docker-compose exec -T backend pip install -r Backend/requirements.txt'
+                    sh 'docker-compose exec -T backend python -m pytest Application/Backend/test_app.py'
 
                     // Run integration tests or smoke tests
                     sh '''
