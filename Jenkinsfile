@@ -27,7 +27,7 @@ pipeline {
                     sh 'docker-compose build'
 
                     // Run backend tests
-                    sh 'docker-compose run --rm backend pip install -r requirements.txt'
+                    sh 'docker-compose run --rm backend pip install -r Backend/requirements.txt'
                     sh 'docker-compose run --rm backend python -m pytest Application/Backend/test_app.py'
                 }
             }
