@@ -5,7 +5,7 @@ pipeline {
         VENV_PATH = 'Application/Backend/venv'
         PATH = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${env.PATH}"
         EC2_USER = 'ec2-user'
-        EC2_INSTANCE_DNS = 'ec2-3-89-75-30.compute-1.amazonaws.com'
+        EC2_INSTANCE_DNS = 'ec2-52-200-216-255.compute-1.amazonaws.com'
     }
 
     stages {
