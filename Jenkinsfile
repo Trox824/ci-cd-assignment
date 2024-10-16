@@ -17,41 +17,48 @@ pipeline {
             }
         }
 
-        stage('Build, Test, and Deploy to Test Environment') {
+        stage('Build and Test') {
             steps {
                 script {
                     // Check if Docker is running
                     sh 'docker info || (echo "Docker is not running. Please start Docker." && exit 1)'
                     
-                    // Stop any existing containers and remove them
-                    sh 'docker-compose down --remove-orphans'
-                    
-                    // Kill any process using port 3000 (use with caution)
-                    sh 'lsof -ti:3000 | xargs kill -9 || true'
-                    
-                    // Wait a moment for the port to be released
-                    sh 'sleep 5'
-
-                    // Build images and start containers
+                    // Enable Docker on macOS if not running
+                    if (isUnix() && sh(script: 'uname', returnStdout: true).trim() == 'Darwin') {
+                        sh '''
+                            if ! docker info > /dev/null 2>&1; then
+                                echo "Docker is not running. Attempting to start Docker..."
+                                open -a Docker
+                                # Wait for Docker to start (adjust timeout as needed)
+                                timeout=60
+                                while ! docker info > /dev/null 2>&1 && [ $timeout -gt 0 ]; do
+                                    sleep 1
+                                    ((timeout--))
+                                done
+                                if [ $timeout -eq 0 ]; then
+                                    echo "Failed to start Docker. Please start it manually."
+                                    exit 1
+                                else
+                                    echo "Docker started successfully."
+                                fi
+                            else
+                                echo "Docker is already running."
+                            fi
+                        '''
+                    }
                     sh 'docker-compose up -d --build'
-
-                    // Wait for services to start (adjust time as needed)
-                    sh 'sleep 30'
-
                     // Run backend tests
-                    sh 'docker-compose exec -T backend pip install -r Backend/requirements.txt'
-                    sh 'docker-compose exec -T backend python -m pytest Application/Backend/test_app.py'
+                    sh 'docker-compose run --rm backend pip install -r Backend/requirements.txt'
+                    sh 'docker-compose run --rm backend python -m pytest Application/Backend/test_app.py'
 
-                    // Run integration tests or smoke tests
-                    sh '''
-                        docker-compose exec -T backend pytest Application/Backend/test_app.py
-                    '''
-
-                    // Stop containers after tests
-                    sh 'docker-compose down --remove-orphans'
+                    // Ensure all containers are stopped after tests
+                    sh 'docker-compose down'
                 }
             }
+            //front end tests
         }
+        
+
 
         // stage('Deploy to Production') {
         //     when {
