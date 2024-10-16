@@ -29,14 +29,18 @@ pipeline {
                     // Run backend tests
                     sh 'docker-compose run --rm backend pip install -r Backend/requirements.txt'
                     sh 'docker-compose run --rm backend python -m pytest Application/Backend/test_app.py'
+
+                    // Ensure all containers are stopped after tests
+                    sh 'docker-compose down'
                 }
             }
+            //front end tests
         }
-
+        
         stage('Deploy to Test Environment') {
             steps {
                 script {
-                    // Stop any existing containers
+                    // Stop any existing containers (just in case)
                     sh 'docker-compose down'
 
                     // Build and start the containers
@@ -49,6 +53,9 @@ pipeline {
                     sh '''
                         docker-compose exec -T backend pytest Application/Backend/test_app.py
                     '''
+
+                    // Stop containers after tests
+                    sh 'docker-compose down'
                 }
             }
         }
