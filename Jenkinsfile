@@ -34,7 +34,7 @@ pipeline {
                             sh 'docker-compose down'
                         }
                     }
-                front end tests
+                
                 }
         stage('Debug Info') {
             steps {
