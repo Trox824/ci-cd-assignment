@@ -40,10 +40,20 @@ pipeline {
         
 
 
+        stage('Debug Info') {
+            steps {
+                script {
+                    echo "Current branch: ${env.GIT_BRANCH}"
+                    echo "All environment variables:"
+                    sh 'env | sort'
+                }
+            }
+        }
+
         stage('Deploy to Production') {
             when {
                 expression { 
-                    return env.GIT_BRANCH == 'main' || env.GIT_BRANCH == 'master'
+                    return env.GIT_BRANCH == 'origin/main' || env.GIT_BRANCH == 'origin/master'
                 }
             }
             steps {
