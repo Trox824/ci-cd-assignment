@@ -34,7 +34,7 @@ pipeline {
             //             sh 'docker-compose down'
             //         }
             //     }
-            //     //front end tests
+            //front end tests
             // }
         stage('Debug Info') {
             steps {
@@ -45,7 +45,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Deploy to Production') {
             when {
                 expression { 
@@ -57,13 +57,14 @@ pipeline {
                     echo "Attempting to deploy to production"
                     sshagent(credentials: ['ec2-ssh-key']) {
                         sh """
-                            ssh -o StrictHostKeyChecking=no -v ${EC2_USER}@${EC2_INSTANCE_DNS} '
+                            set -xe
+                            ssh -o StrictHostKeyChecking=no -v ${EC2_USER}@${EC2_INSTANCE_DNS} << EOF
                                 echo "Successfully connected to EC2 instance"
-                                cd ~/ci-cd-assignment || echo "Failed to change directory"
-                                git pull origin main || echo "Failed to pull latest changes"
-                                docker-compose down || echo "Failed to stop existing containers"
-                                docker-compose up -d --build || echo "Failed to start new containers"
-                            '
+                                cd ~/ci-cd-assignment || { echo "Failed to change directory"; exit 1; }
+                                git pull origin main || { echo "Failed to pull latest changes"; exit 1; }
+                                docker-compose down || { echo "Failed to stop existing containers"; exit 1; }
+                                docker-compose up -d --build || { echo "Failed to start new containers"; exit 1; }
+                            EOF
                         """
                     }
                 }
