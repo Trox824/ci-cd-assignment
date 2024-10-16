@@ -3,14 +3,16 @@ import os
 from fastapi.testclient import TestClient
 from unittest.mock import patch
 import requests  # Import requests to access RequestException
-from app import app
-
-client = TestClient(app)
 
 # Add the project root to sys.path
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
+
+# Import the app after adding the project root to sys.path
+from Application.Backend.app import app
+
+client = TestClient(app)
 
 def test_read_root():
     response = client.get("/")
