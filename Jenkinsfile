@@ -99,7 +99,7 @@ pipeline {
                                     echo "Deploying to instance ${instanceId} (${instanceIp})..."
                                     def deploymentResult = sh(
                                         script: """
-                                            ssh -o StrictHostKeyChecking=no -v ec2-user@${instanceIp} << EOF
+                                            ssh -o StrictHostKeyChecking=no -v ec2-user@${instanceIp} << 'ENDSSH'
                                                 set -xe
                                                 echo "Connected to instance ${instanceId}"
                                                 cd ~/ci-cd-assignment || { echo "Failed to change directory"; exit 1; }
@@ -120,7 +120,7 @@ pipeline {
                                                 echo "Cleaning up Docker system..."
                                                 docker system prune -af || { echo "Failed to clean up Docker system"; exit 1; }
                                                 echo "Deployment to instance ${instanceId} completed successfully"
-                                            EOF
+                                            ENDSSH
                                         """,
                                         returnStatus: true
                                     )
