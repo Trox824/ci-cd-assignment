@@ -40,8 +40,14 @@ pipeline {
         stage('Deploy to Test Environment') {
             steps {
                 script {
-                    // Stop any existing containers (just in case)
-                    sh 'docker-compose down'
+                    // Stop any existing containers and remove them
+                    sh 'docker-compose down --remove-orphans'
+                    
+                    // Kill any process using port 3000 (use with caution)
+                    sh 'lsof -ti:3000 | xargs kill -9 || true'
+                    
+                    // Wait a moment for the port to be released
+                    sh 'sleep 5'
 
                     // Build and start the containers
                     sh 'docker-compose up -d --build'
@@ -55,7 +61,7 @@ pipeline {
                     '''
 
                     // Stop containers after tests
-                    sh 'docker-compose down'
+                    sh 'docker-compose down --remove-orphans'
                 }
             }
         }
